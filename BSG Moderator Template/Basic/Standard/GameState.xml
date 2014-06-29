@@ -158,27 +158,27 @@ sub UpdateLocations
 				locidx	= locidx + 1
 			end if
 			
+			if HubDestroyed() then
+				LocCylon(3)	= &quot;Hub Destroyed&quot;
+			end if
+			
 			for tmpidx = 0 to ubound(locCylon)
 				redim preserve loclst(locidx) as string
 				loclst(locidx)	= locCylon(tmpidx)
 				locidx	= locidx + 1
 			next tmpidx
 			
-&apos;			if HubDestroyed() then
-&apos;				loclst(4)	= &quot;Hub Destroyed&quot;
-&apos;			end if
-			
-&apos;			if DaybreakRebelBasestarAvailable() and RebelBasestarAllegiance() = &quot;Cylon&quot; then
-&apos;				redim preserve loclst(locidx) as string
-&apos;				loclst(locidx) = &quot;---------------&quot;
-&apos;				locidx	= locidx + 1
-&apos;				
-&apos;				for tmpidx = 0 to ubound(locRBBDay)
-&apos;					redim preserve loclst(locidx) as string
-&apos;					loclst(locidx)	= locRBBDay(tmpidx)
-&apos;					locidx	= locidx + 1
-&apos;				next tmpidx
-&apos;			end if
+			if DRBBAllegiance() = &quot;Cylon&quot; then
+				redim preserve loclst(locidx) as string
+				loclst(locidx) = &quot;---------------&quot;
+				locidx	= locidx + 1
+				
+				for tmpidx = 0 to ubound(locRBBDay)
+					redim preserve loclst(locidx) as string
+					loclst(locidx)	= locRBBDay(tmpidx)
+					locidx	= locidx + 1
+				next tmpidx
+			end if
 			isfirst = FALSE
 		end if
 	end if
@@ -273,21 +273,21 @@ sub UpdateLocations
 				
 				for tmpidx = 0 to ubound(locDem)
 					redim preserve loclst(locidx) as string
-					loclst(locidx)	= locC1(tmpidx)
+					loclst(locidx)	= locDem(tmpidx)
 					locidx	= locidx + 1
 				next tmpidx
 			
-&apos;				if DaybreakRebelBasestarAvailable() and RebelBasestarAllegiance() = &quot;Human&quot; then
-&apos;					redim preserve loclst(locidx) as string
-&apos;					loclst(locidx) = &quot;---------------&quot;
-&apos;					locidx	= locidx + 1
-&apos;					
-&apos;					for tmpidx = 0 to ubound(locRBBDay)
-&apos;						redim preserve loclst(locidx) as string
-&apos;						loclst(locidx)	= locRBBDay(tmpidx)
-&apos;						locidx	= locidx + 1
-&apos;					next tmpidx
-&apos;				end if
+				if DRBBAllegiance() = &quot;Human&quot; then
+					redim preserve loclst(locidx) as string
+					loclst(locidx) = &quot;---------------&quot;
+					locidx	= locidx + 1
+					
+					for tmpidx = 0 to ubound(locRBBDay)
+						redim preserve loclst(locidx) as string
+						loclst(locidx)	= locRBBDay(tmpidx)
+						locidx	= locidx + 1
+					next tmpidx
+				end if
 			end if
 			isfirst = FALSE
 		end if

@@ -40,11 +40,20 @@ const _CapricaValueCol = _CapricaCol + 12
 const _CapricaRow = _CrisisRow + _MaxCrisisCnt + 3
 const _CapricaCnt = 30
 
+const _MissionCol			= 0
+const _MissionActiveCol		= _MissionCol + 1
+const _MissionDiscardCol	= _MissionCol + 2
+const _MissionSkillCol		= _CrisisSkillCol
+const _MissionValueCol		= _CrisisValueCol
+const _MissionDistanceCol	= 13
+const _MissionRow			= _CapricaRow + _CapricaCnt + 4
+const _MissionCnt			= 8
+
 const _ColonyCol = 0
 const _ColonyTypeCol = _ColonyCol + 2
 const _ColonySkillCol = _ColonyCol + 6
 const _ColonyValueCol = _ColonyCol + 12
-const _ColonyRow = _CapricaRow + _CapricaCnt + 3
+const _ColonyRow = _MissionRow + _MissionCnt + 3
 const _ColonyCnt = 30
 
 const _CrisisTypeReg = 0
@@ -81,9 +90,10 @@ const _MaxCrisisDeckCol = 0
 const _MaxSuperCrisisDeckCol = 1
 const _MaxDeckRow = 0
 
-const _DeckCrisis = 0
-const _DeckNewCaprica = 1
-const _DeckColony = 2
+const _DeckCrisis 		= 0
+const _DeckNewCaprica	= 1
+const _DeckMission		= 2
+const _DeckColony 		= 3
 
 dim CrisisSheet, CrisisForm as object
 
@@ -216,6 +226,17 @@ function TopOfCapricaDeck as integer
 	TopOfCapricaDeck	= topofdeck
 end function
 
+function TopOfMissionDeck as integer
+	dim topofdeck as integer
+	
+	topofdeck	= 1
+	do while CrisisSheet.getCellByPosition(_MissionCol, _MissionRow + topofdeck).string = &quot;&quot; and CrisisSheet.getCellByPosition(_MissionActiveCol, _MissionRow + topofdeck).string = &quot;&quot;
+		topofdeck	= topofdeck + 1
+	loop
+	
+	TopOfMissionDeck	= topofdeck
+end function
+
 function TopOfColonyDeck as integer
 	dim topofdeck as integer
 	
@@ -224,7 +245,7 @@ function TopOfColonyDeck as integer
 		topofdeck	= topofdeck + 1
 	loop
 
-	TopOfColonyDeck=topofdeck
+	TopOfColonyDeck	= topofdeck
 end function
 
 function CheckSpecialAbility as boolean
@@ -801,6 +822,10 @@ sub ShuffleNCDeck (shuffleALL as boolean)
 	end if
 end sub
 
+sub ShuffleMissionDeck (shuffleALL as boolean)
+
+end sub
+
 sub ShuffleColonyDeck (shuffleALL as boolean)
 	dim tmpval, sortOrder(_ColonyCnt) as double
 	dim tmpcrisis, crisislst(_ColonyCnt) as variant
@@ -935,6 +960,11 @@ sub Configure_CrisisCards
 			CrisisSheet.Rows(_CapricaRow + currow).IsVisible = FALSE
 		end if
 	next currow
+	
+	&apos; If we&apos;re not playing with ObjectiveIsEarth(), hide the Mission deck.
+	for currow = -1 to _MissionCnt + 1
+			CrisisSheet.Rows(_MissionRow + currow).IsVisible	= ObjectiveIsEarth()
+	next currow
 
 	&apos; if we&apos;re not playing ObjectiveIsColony(), go ahead and hide theColony crisis card section
 	&apos; in this case we hide or show the whole deck, so the &quot;deck size&quot; row is included
@@ -959,7 +989,7 @@ sub Initialize_CrisisCards
 			CrisisSheet.getCellByPosition(_CrisisCol, _CrisisRow + crisisID).string = 	CrisisSheet.getCellByPosition(_CrisisCol + 1, _CrisisRow + crisisID).string
 			CrisisSheet.getCellByPosition(_CrisisCol, _CrisisRow + crisisID).CharColor = 	CrisisSheet.getCellByPosition(_CrisisCol + 1, _CrisisRow + crisisID).CharColor
 		end if
-		CrisisSheet.getCellByPosition(_CrisisCol+1, _CrisisRow + crisisID).string = &quot;&quot;
+		CrisisSheet.getCellByPosition(_CrisisCol + 1, _CrisisRow + crisisID).string = &quot;&quot;
 	next crisisID
 	
 	for crisisID = 1 to _CapricaCnt
@@ -967,7 +997,15 @@ sub Initialize_CrisisCards
 			CrisisSheet.getCellByPosition(_CapricaCol, _CapricaRow + crisisID).string = CrisisSheet.getCellByPosition(_CapricaCol + 1, _CapricaRow + crisisID).string
 			CrisisSheet.getCellByPosition(_CapricaCol, _CapricaRow + crisisID).CharColor = CrisisSheet.getCellByPosition(_CapricaCol + 1, _CapricaRow + crisisID).CharColor
 		end if
-		CrisisSheet.getCellByPosition(_CapricaCol+1, _CapricaRow + crisisID).string = &quot;&quot;
+		CrisisSheet.getCellByPosition(_CapricaCol + 1, _CapricaRow + crisisID).string = &quot;&quot;
+	next crisisID
+	
+	for crisisID = 1 to _MissionCnt
+		if CrisisSheet.getCellByPosition(_MissionCol, _MissionRow + crisisID).string = &quot;&quot; then
+			CrisisSheet.getCellByPosition(_MissionCol, _MissionRow + crisisID).string	= CrisisSheet.getCellByPosition(_MissionDiscardCol, _MissionRow + crisisID).string
+		end if
+		CrisisSheet.getCellByPosition(_MissionActiveCol, _MissionRow + crisisID).string	= &quot;&quot;
+		CrisisSheet.getCellByPosition(_MissionDiscardCol, _MissionRow + crisisID).string	= &quot;&quot;
 	next crisisID
 	
 	for crisisID = 1 to _ColonyCnt
@@ -980,11 +1018,13 @@ sub Initialize_CrisisCards
 	
 	SetBuryCnt _DeckCrisis, TRUE
 	SetBuryCnt _DeckNewCaprica, TRUE
+	SetBuryCnt _DeckMission, TRUE
 	SetBuryCnt _DeckColony, TRUE
 	
 	Configure_CrisisCards
 	ShuffleCrisisDeck TRUE
 	ShuffleNCDeck TRUE
+	ShuffleMissionDeck TRUE
 	ShuffleColonyDeck TRUE
 	ResetColors
 	EnableThirtyThree FALSE
@@ -1097,7 +1137,6 @@ sub Initialize_Super
 			crisisdata(i) = CrisisSheet.getCellByPosition(_SuperCol + i, _SuperRow + superID).string
 		next i
 		superlst(superID) = crisisdata()
-
 	next superID
 	
 	for i = 1 to maxcnt -1

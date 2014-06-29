@@ -598,7 +598,7 @@ sub Step3Complete
 		grpOpt(_ObjectiveIonianNebula).enabled	= TRUE
 	end if
 	if GameTypeIsDaybreak then
-&apos;		grpOpt(_ObjectiveEarth).enabled			= TRUE
+		grpOpt(_ObjectiveEarth).enabled			= TRUE
 	end if
 	if GameTypeIsRevelations then
 &apos;		grpOpt(_ObjectiveColony).enabled 		= TRUE
